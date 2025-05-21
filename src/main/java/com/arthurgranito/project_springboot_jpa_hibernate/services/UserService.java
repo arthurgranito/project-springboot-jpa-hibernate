@@ -2,8 +2,11 @@ package com.arthurgranito.project_springboot_jpa_hibernate.services;
 
 import com.arthurgranito.project_springboot_jpa_hibernate.entities.User;
 import com.arthurgranito.project_springboot_jpa_hibernate.repositories.UserRepository;
+import com.arthurgranito.project_springboot_jpa_hibernate.services.exceptions.DatabaseException;
 import com.arthurgranito.project_springboot_jpa_hibernate.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +32,12 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        repository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        try {
+            repository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException(e.getMessage());
+        }
     }
 
     public User update(Long id, User user) {
