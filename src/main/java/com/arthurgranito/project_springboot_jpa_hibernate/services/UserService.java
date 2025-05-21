@@ -2,6 +2,7 @@ package com.arthurgranito.project_springboot_jpa_hibernate.services;
 
 import com.arthurgranito.project_springboot_jpa_hibernate.entities.User;
 import com.arthurgranito.project_springboot_jpa_hibernate.repositories.UserRepository;
+import com.arthurgranito.project_springboot_jpa_hibernate.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +14,14 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
-    public List<User> findAll(){
+    public List<User> findAll() {
         return repository.findAll();
     }
 
     public User findById(Long id) {
         Optional<User> user = repository.findById(id);
 
-        return user.get();
+        return user.orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
     public User insert(User user) {
